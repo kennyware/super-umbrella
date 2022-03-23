@@ -53,22 +53,22 @@
     <section id="product-section" class="container">
         <div class="product-images">
             <div class="product-display">
-                <img src="./img/image-product-1.jpg" class="active primary-img" data-index="0" onclick="toggleLightbox(event)">
+                <img src="./img/image-product-1.jpg" class="active primary-img" data-index="0" onclick="toggleLightbox()">
                 <img src="./img/image-product-2.jpg" class="primary-img" data-index="1" onclick="toggleLightbox(event)">
                 <img src="./img/image-product-3.jpg" class="primary-img" data-index="2" onclick="toggleLightbox(event)">
                 <img src="./img/image-product-4.jpg" class="primary-img" data-index="3" onclick="toggleLightbox(event)">
-                <div class="previous-btn">
+                <div class="previous-btn" onclick="changeDisplay(-1)">
                     <svg width="12" height="12" viewBox="0 0 12 18" xmlns="http://www.w3.org/2000/svg"><path d="M11 1 3 9l8 8" stroke="#1D2026" stroke-width="3" fill="none" fill-rule="evenodd"/></svg>
                 </div>
-                <div class="next-btn">
+                <div class="next-btn" onclick="changeDisplay(1)">
                     <svg width="12" height="12" viewBox="0 0 13 18" xmlns="http://www.w3.org/2000/svg"><path d="m2 1 8 8-8 8" stroke="#1D2026" stroke-width="3" fill="none" fill-rule="evenodd"/></svg>
                 </div>
             </div>
             <div class="image-thumbnails">
-                <div class="thumbnail selected" onclick="currentSlide(0)"><img src="./img/image-product-1-thumbnail.jpg" alt="" ></div>
-                <div class="thumbnail" onclick="currentSlide(1)"><img src="./img/image-product-2-thumbnail.jpg" alt=""></div>
-                <div class="thumbnail" onclick="currentSlide(2)"><img src="./img/image-product-3-thumbnail.jpg" alt=""></div>
-                <div class="thumbnail" onclick="currentSlide(3)"><img src="./img/image-product-4-thumbnail.jpg" alt=""></div>
+                <div class="thumbnail selected" onclick="currentDisplay(0)"><img src="./img/image-product-1-thumbnail.jpg" alt="" ></div>
+                <div class="thumbnail" onclick="currentDisplay(1)"><img src="./img/image-product-2-thumbnail.jpg" alt=""></div>
+                <div class="thumbnail" onclick="currentDisplay(2)"><img src="./img/image-product-3-thumbnail.jpg" alt=""></div>
+                <div class="thumbnail" onclick="currentDisplay(3)"><img src="./img/image-product-4-thumbnail.jpg" alt=""></div>
             </div>
         </div>
         
@@ -92,14 +92,14 @@
         </div>
     </section>
 
-    <div class="lightbox container">
+    <div id="lightbox">
         <div class="lightbox-group">
             <svg width="14" height="15" viewBox="0 0 14 15" xmlns="http://www.w3.org/2000/svg" class="close-btn"  onclick="toggleLightbox(event)"><path d="m11.596.782 2.122 2.122L9.12 7.499l4.597 4.597-2.122 2.122L7 9.62l-4.595 4.597-2.122-2.122L4.878 7.5.282 2.904 2.404.782l4.595 4.596L11.596.782Z" fill-rule="evenodd"/></svg>
             <div class="product-display">
-                <img src="./img/image-product-1.jpg" class="active primary-img" data-index="0">
-                <img src="./img/image-product-2.jpg" class="primary-img" data-index="1">
-                <img src="./img/image-product-3.jpg" class="primary-img" data-index="2">
-                <img src="./img/image-product-4.jpg" class="primary-img" data-index="3">
+                <img src="./img/image-product-1.jpg" class="active primary-img slide" data-index="0">
+                <img src="./img/image-product-2.jpg" class="primary-img slide" data-index="1">
+                <img src="./img/image-product-3.jpg" class="primary-img slide" data-index="2">
+                <img src="./img/image-product-4.jpg" class="primary-img slide" data-index="3">
                 <div class="previous-btn" onclick="changeSlide(-1)">
                     <svg width="12" height="12" viewBox="0 0 12 18" xmlns="http://www.w3.org/2000/svg"><path d="M11 1 3 9l8 8" stroke="#1D2026" stroke-width="3" fill="none" fill-rule="evenodd"/></svg>
                 </div>
@@ -108,19 +108,19 @@
                 </div>
             </div>
             <div class="image-thumbnails">
-                <div class="thumbnail selected" onclick="currentSlide(0)">
+                <div class="thumbnail selected" onclick="toSlide(0)">
                     <div class="whiteout"></div>
                     <img src="./img/image-product-1-thumbnail.jpg" alt="" >
                 </div>
-                <div class="thumbnail" onclick="currentSlide(1)">
+                <div class="thumbnail" onclick="toSlide(1)">
                     <div class="whiteout"></div>
                     <img src="./img/image-product-2-thumbnail.jpg" alt="">
                 </div>
-                <div class="thumbnail" onclick="currentSlide(2)">
+                <div class="thumbnail" onclick="toSlide(2)">
                     <div class="whiteout"></div>
                     <img src="./img/image-product-3-thumbnail.jpg" alt="">
                 </div>
-                <div class="thumbnail" onclick="currentSlide(3)">
+                <div class="thumbnail" onclick="toSlide(3)">
                     <div class="whiteout"></div>
                     <img src="./img/image-product-4-thumbnail.jpg" alt="">
                 </div>
@@ -131,11 +131,13 @@
     <script>
         var slides = document.getElementsByClassName('slide')
         var imgThumbnails = document.querySelectorAll('#product-section .thumbnail')
-        var displayImgs = document.getElementsByClassName('primary-img')
-        var lightbox = document.querySelector('.lightbox')
-        lightbox.addEventListener('click', toggleLightbox, true)
+        var lightboxThumbs = document.querySelectorAll('#lightbox .thumbnail')
+        var displayImgs = document.querySelectorAll('#product-section .primary-img')
+        var lightbox = document.getElementById('lightbox')
+        var slideIndex = 0;
+        var displayIndex = 0;
 
-        function currentSlide(n) {
+        function currentDisplay(n) {
             if(imgThumbnails[n].classList.contains('selected')) return
 
             for(let i = 0; i < imgThumbnails.length; i++) {
@@ -148,8 +150,55 @@
                 }
             }
 
+            toSlide(n)
+
             imgThumbnails[n].classList.add('selected')
             displayImgs[n].classList.add('active')            
+        }
+
+        function changeDisplay(n) {
+            displayIndex += n
+            if(displayIndex < 0) {
+                displayIndex = displayImgs.length - 1
+            }
+
+            if(displayIndex > displayImgs.length - 1) {
+                displayIndex = 0
+            }
+
+            for(var i = 0; i < displayImgs.length; i ++) {
+                displayImgs[i].classList.remove('active')
+            }
+
+            // toSlide(displayIndex)
+            
+            displayImgs[displayIndex].classList.add('active')     
+        }
+
+        function changeSlide(n) { 
+            showSlide(slideIndex += n)
+        }
+
+        function toSlide(n) {
+            showSlide(slideIndex = n)
+        }
+
+        function showSlide(n) {
+            if(n > slides.length - 1) {
+                slideIndex = 0
+            }
+
+            if(n < 0) {
+                slideIndex = slides.length - 1
+            }
+
+            for(var i = 0; i < slides.length; i++) {
+                slides[i].classList.remove('active')
+                lightboxThumbs[i].classList.remove('selected')
+            }
+
+            slides[slideIndex].classList.add('active')
+            lightboxThumbs[slideIndex].classList.add('selected')   
         }
 
         function changeCount(n) {
@@ -164,9 +213,21 @@
             }
         }
 
-        function toggleLightbox(e) {
-            // e.stopImmediatePropagation()
-            // e.stopPropagation()
+        window.onclick = function(e) {
+            if(e.target == lightbox) {
+                toggleLightbox()
+            }
+        }
+
+        function toggleLightbox() {
+            if(window.matchMedia('(max-width: 390px)')) return
+
+            for(var i = 0; i < displayImgs.length; i++) {
+                if(displayImgs[i].classList.contains('active')) {
+                    slideIndex = i
+                }
+            }
+            showSlide(slideIndex)
             lightbox.classList.toggle('open')
         }
     </script>

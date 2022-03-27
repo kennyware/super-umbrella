@@ -134,6 +134,7 @@ img {
 }
 
 .cart-count {
+    display: none;
     position: absolute;
     background: var(--primary-orange);
     border-radius: 50%;
@@ -177,6 +178,7 @@ img {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
     padding-bottom: 10px;
 }
 

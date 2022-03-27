@@ -142,6 +142,7 @@
         var slideIndex = 0;
         var displayIndex = 0;
         var productCount = document.getElementsByClassName('product-count')[0]
+        var cartCount = 0;
 
         var sneakers = [
             {
@@ -155,7 +156,7 @@
 
         var cartItems = []
 
-
+        // change product display based on which thumbnail is clicked
         function currentDisplay(n) {
             if(imgThumbnails[n].classList.contains('selected')) return
 
@@ -175,6 +176,7 @@
             displayImgs[n].classList.add('active')            
         }
 
+        // Change product display based on which mobile button is clicked
         function changeDisplay(n) {
             displayIndex += n
             if(displayIndex < 0) {
@@ -188,20 +190,21 @@
             for(var i = 0; i < displayImgs.length; i ++) {
                 displayImgs[i].classList.remove('active')
             }
-
-            // toSlide(displayIndex)
             
             displayImgs[displayIndex].classList.add('active')     
         }
 
+        // Change image slide based on which button is clicked in the lightbox
         function changeSlide(n) { 
             showSlide(slideIndex += n)
         }
 
+        // Go to the image slide determined by which the thumbnail is clicked in the lightbox
         function toSlide(n) {
             showSlide(slideIndex = n)
         }
 
+        // Handle the the changing of the product display image in the lightbox
         function showSlide(n) {
             if(n > slides.length - 1) {
                 slideIndex = 0
@@ -220,6 +223,7 @@
             lightboxThumbs[slideIndex].classList.add('selected')   
         }
 
+        // Update the number of products to be added to cart
         function changeCount(n) {
             var count = +productCount.innerHTML;
 
@@ -232,15 +236,18 @@
         }
 
         window.onclick = function(e) {
+            // Handle exiting lightbox when clicking outside of it
             if(e.target == lightbox) {
                 toggleLightbox()
             }
 
+            // Handle exiting mobile menu when clicking outside of it
             if(e.target == mobileMenu) {
                 toggleMenu()
             }
         }
 
+        // Handle opening and closing lightbox
         function toggleLightbox() {
             if(window.matchMedia('(max-width: 420px)')) return
 
@@ -253,16 +260,36 @@
             lightbox.classList.toggle('open')
         }
 
+        // Handle opening and closing mobile menu
         function toggleMenu() {
             mobileMenu.classList.toggle('open')
         }
 
+        // Add products to cart based on the number in the product counter
         function addToCart() {
             var count = +productCount.innerHTML;
             if(count < 1) return
             showInCart(count, sneakers[0])
+            updateCartCount(count)
+            
         }
 
+        function updateCartCount(count) {
+            var cartCounter = document.querySelector('.cart-count')
+            var cart = document.querySelector('.cart-control .products')
+            
+            cartCount += count
+            if(cartCount > 0) {
+                cartCounter.style.display = 'block'
+                cartCounter.innerHTML = cartCount
+            } else {
+                cartCounter.innerHTML = ''
+                cartCounter.style.display = 'none'
+                cart.innerHTML = '<strong>Your cart is empty.</strong>'
+            }
+        }
+
+        // Show items added to cart in HTML
         function showInCart(quantity, item) {
             var cart = document.querySelector('.cart-control .products')
 
@@ -275,7 +302,10 @@
                 total += item.price * item.discount
             }
 
+            var id = Math.floor((Math.random() * 1000) + 1)
+
             var newItem = {
+                id,
                 total: total.toFixed(2),
                 name: item.name,
                 price: (item.price * item.discount).toFixed(2),
@@ -284,7 +314,7 @@
 
             cartItems.push(newItem)
 
-            var productTemplate = `<div class="product">
+            var productTemplate = `<div class="product" data-id=${id} data-quantity=${newItem.quantity}>
                             <div class="product-thumb">
                                 <img src="./img/image-product-1-thumbnail.jpg" alt="" class=""/>
                             </div>
@@ -292,13 +322,24 @@
                                 <p>${newItem.name}</p>
                                 <p>$${newItem.price} x ${newItem.quantity} <span class="total">$${newItem.total}</span></p>
                             </div>
-                            <button class="delete-btn">
+                            <button class="delete-btn" onclick="deleteItem(event)">
                                 <svg viewBox="0 0 14 16" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="trash-icon"><path d="M0 2.625V1.75C0 1.334.334 1 .75 1h3.5l.294-.584A.741.741 0 0 1 5.213 0h3.571a.75.75 0 0 1 .672.416L9.75 1h3.5c.416 0 .75.334.75.75v.875a.376.376 0 0 1-.375.375H.375A.376.376 0 0 1 0 2.625Zm13 1.75V14.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 1 14.5V4.375C1 4.169 1.169 4 1.375 4h11.25c.206 0 .375.169.375.375ZM4.5 6.5c0-.275-.225-.5-.5-.5s-.5.225-.5.5v7c0 .275.225.5.5.5s.5-.225.5-.5v-7Zm3 0c0-.275-.225-.5-.5-.5s-.5.225-.5.5v7c0 .275.225.5.5.5s.5-.225.5-.5v-7Zm3 0c0-.275-.225-.5-.5-.5s-.5.225-.5.5v7c0 .275.225.5.5.5s.5-.225.5-.5v-7Z" id="a" fill-rule="nonzero"/></svg>
                             </button>
                         </div>`
 
             cart.insertAdjacentHTML('beforeend', productTemplate)
+        }
 
+        function deleteItem(e) {
+            var currentProduct = e.target.closest('.product')
+            var quantity = +currentProduct.getAttribute('data-quantity')
+
+            cartItems = cartItems.filter(function(item) {
+                return item.id !== +currentProduct.getAttribute('data-id')
+            })
+
+            updateCartCount(-quantity)
+            currentProduct.remove()
             
         }
     </script>
